@@ -107,12 +107,15 @@ def get_migrations(migration_directories, import_modules=False, reverse=False):
 
 
 def get_schema_versions(cursor, versions_only=True):
-    cursor.execute('SELECT * FROM schema_migrations ORDER BY version')
-    for i in cursor.fetchall():
-        if versions_only:
-            yield i[0]
-        else:
-            yield i
+    try:
+        cursor.execute('SELECT * FROM schema_migrations ORDER BY version')
+        for i in cursor.fetchall():
+            if versions_only:
+                yield i[0]
+            else:
+                yield i
+    except psycopg2.ProgrammingError:
+        return
 
 
 def get_pending_migrations(migration_directories, cursor, import_modules=False,
